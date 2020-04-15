@@ -60,6 +60,12 @@ def rename_ages(x):
         new = re.sub("\s-\s", "_to_", x)
     return new
 
+def rename_poverty(df):
+    income_dict = {'Below Poverty': 'Below Poverty', '<= $75,000, Above Poverty': 'Above Poverty',
+                   '> $75,000': "Above $75k"}
+    df['income_poverty'] = df['income_poverty'].map(income_dict)
+    return df
+
 def rent_or_own_to_homeowner(df):
     val_dict = {"Own":1, "Rent":0}
     df["rent_or_own"]=df["rent_or_own"].map(val_dict)
@@ -90,6 +96,7 @@ def redundant_missing(df):
 
 def initial_cleaning(df):
     df = rent_or_own_to_homeowner(df)
+    df = rename_poverty(df)
     return df
 
 def fit_clean_data(df, impute_dict):
