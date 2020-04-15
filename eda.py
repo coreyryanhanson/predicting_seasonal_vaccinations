@@ -7,3 +7,10 @@ def calc_chi_squared(df, column, target):
     print(table)
     return chi2_contingency(table)
 
+def chi_squared_loop(df, target, alpha):
+    failed_cols = []
+    for column in df.columns:
+        chi = calc_chi_squared(df, column, target)
+        if chi[1] > alpha:
+            failed_cols.append([column, chi[1]])
+    return failed_cols

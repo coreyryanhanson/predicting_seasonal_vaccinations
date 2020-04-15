@@ -79,8 +79,15 @@ def redundant_missing_group(df, term):
     return df.drop(columns=redundant_columns)
 
 def redundant_missing(df):
+    # This group of missing dummy variables was highly correlated to each other, so it was dropped.
     df = redundant_missing_group(df, "missing_opinion")
 
+    #These columns failed the chi squared test with both target variables.
+    df = df.drop(columns=extract_column_names(df, "^missing_behavioral"))
+    df = df.drop(columns='missing_h1n1_concern')
+    df = df.drop(columns='missing_h1n1_knowledge')
+
+    #This group had perfect correlation with each other meaning that they were missing in pairs and only one is useful.
     df = df.rename(columns={"missing_household_adults": "missing_household"})
     df = df.rename(columns={'missing_doctor_recc_h1n1': 'missing_doctor_recc'})
     df = df.drop(columns="missing_household_children")
