@@ -1,4 +1,6 @@
+import re
 import math
+import colorsys
 import numpy as np
 import pandas as pd
 import scipy.stats as scs
@@ -46,7 +48,7 @@ def z_test_proportions(df, column, target, target_val, alpha):
 
 
 
-def dynamic_heatmap(df, columns, fontsize=20, annot=False, figsize=(15, 10), squaresize=500):
+def dynamic_heatmap(df, columns, fontsize=20, annot=False, palette=None, figsize=(15, 10), squaresize=500):
     """Plots a heatmap that changes size values depending on correlation Adapted from:
     https://towardsdatascience.com/better-heatmaps-and-correlation-matrix-plots-in-python-41445d0f2bec"""
 
@@ -82,8 +84,11 @@ def dynamic_heatmap(df, columns, fontsize=20, annot=False, figsize=(15, 10), squ
 
     size_scale = squaresize
 
-    n_colors = 256  # Use 256 colors for the diverging color palette
-    palette = sns.diverging_palette(23, 229, s=84, l=47, sep=1, n=n_colors)  # Create the palette
+    if palette:
+        n_colors = len(palette)
+    else:
+        n_colors = 256  # Use 256 colors for the diverging color palette
+        palette = sns.diverging_palette(20, 220, n=n_colors) # Create the palette
     color_min, color_max = [-1,
                             1]  # Range of values that will be mapped to the palette, i.e. min and max possible correlation
     color = corr["value"]
@@ -152,3 +157,28 @@ def dynamic_heatmap(df, columns, fontsize=20, annot=False, figsize=(15, 10), squ
     ax.set_yticks(np.linspace(min(bar_y), max(bar_y), 3))  # Show vertical ticks for min, middle and max
     ax.yaxis.tick_right()  # Show vertical ticks on the right
     plt.show()
+
+def hex_to_hsl(hex_color, dec=False):
+    rgb = hex_to_rgb(hex_color, True)
+    raw_hls = colorsys.rgb_to_hls(*rgb)
+    if dec:
+        return raw_hsl
+    else:
+        h, l, s = int(raw_hls[0]*360), int(raw_hls[1]*100), int(raw_hls[2]*100)
+        return [h, s, l]
+
+def hex_to_rgb(hex_color, dec=False):
+    if hex_color[0] and len(hex_color) == 7:
+        search = re.search("#(\w{2})(\w{2})(\w{2})", hex_color)
+        if dec:
+            return [int(search.group(i), 16)/256 for i in np.arange(1,4)]
+        else:
+            return [int(search.group(i), 16) for i in np.arange(1,4)]
+    else:
+        print(f"{hex_color} is not formatted correctly")
+
+def independant_palette(color1, color2, sep=10, n_colors=256):
+    hsl1, hsl2 = hex_to_hsl(color1), hex_to_hsl(color2)
+    pal1 = sns.diverging_palette(hsl1[0], hsl2[0], s=hsl1[1], l=hsl1[2], sep=sep, n=n_colors)
+    pal2 = sns.diverging_palette(hsl1[0], hsl2[0], s=hsl2[1], l=hsl2[2], sep=sep, n=n_colors)
+    return [*pal1[0:n_colors//2], *pal2[n_colors//2:]]

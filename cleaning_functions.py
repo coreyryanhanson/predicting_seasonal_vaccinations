@@ -76,10 +76,13 @@ def rent_or_own_to_homeowner(df):
     df["rent_or_own"]=df["rent_or_own"].map(val_dict)
     return df.rename(columns={"rent_or_own":"homeowner"})
 
-def redundant_combine(df, redundant_columns):
+def redundant_combine(df, redundant_columns, strict=False):
     redundant_data = [df[column] for column in redundant_columns]
     redundant_sum = sum(redundant_data)
-    return np.where(redundant_sum.values >= 1, 1, 0)
+    if strict:
+        return np.where(redundant_sum.values == len(redundant_data), 1, 0)
+    else:
+        return np.where(redundant_sum.values >= 1, 1, 0)
 
 def redundant_missing_group(df, term):
     redundant_columns = [column for column in extract_column_names(df, "^"+term)]
