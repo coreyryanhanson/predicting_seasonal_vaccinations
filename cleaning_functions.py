@@ -14,7 +14,12 @@ def categorical_nans(df, value):
 
 def gen_impute_dict(binary, ordinal, continuous):
     impute_dict = OrderedDict()
-    for column in binary:
+
+    #This list shows columns whose missing values are highly correlated with each other where it is better to
+    #impute the mode and keep one dummy for the missing values instead of having 3 individual columns,
+    correlated_unknowns = ["marital_status", "employment_status", "education"]
+
+    for column in [*binary, *correlated_unknowns]:
         impute_dict[column] = [np.nan, "most_frequent", None]
     for column in [*ordinal, *continuous]:
         impute_dict[column] = [np.nan, "median", None]
@@ -71,11 +76,17 @@ def rent_or_own_to_homeowner(df):
     df["rent_or_own"]=df["rent_or_own"].map(val_dict)
     return df.rename(columns={"rent_or_own":"homeowner"})
 
-def redundant_missing_group(df, term):
-    redundant_columns = [column for column in extract_column_names(df, "^"+term)]
+def redundant_combine(df, redundant_columns, strict=False):
     redundant_data = [df[column] for column in redundant_columns]
     redundant_sum = sum(redundant_data)
-    df[term] = np.where(redundant_sum.values >= 1, 1, 0)
+    if strict:
+        return np.where(redundant_sum.values == len(redundant_data), 1, 0)
+    else:
+        return np.where(redundant_sum.values >= 1, 1, 0)
+
+def redundant_missing_group(df, term):
+    redundant_columns = [column for column in extract_column_names(df, "^"+term)]
+    df[term] = redundant_combine(df, redundant_columns)
     return df.drop(columns=redundant_columns)
 
 def redundant_missing(df):
@@ -92,6 +103,11 @@ def redundant_missing(df):
     df = df.rename(columns={'missing_doctor_recc_h1n1': 'missing_doctor_recc'})
     df = df.drop(columns="missing_household_children")
     df = df.drop(columns='missing_doctor_recc_seasonal')
+
+    #This group contained very high correlation together so they were combined.
+    redundant_columns = ['missing_marital_status', 'missing_employment_status', 'missing_education']
+    df["missing_demographics"] = redundant_combine(df, redundant_columns)
+    df = df.drop(columns=redundant_columns)
 
     #The following three columns are highly correlated, but do not share any apparent relationship. Since they
     # make up an insiginificant portion of the data, they are all dropped.
