@@ -30,6 +30,16 @@ def chi_squared_loop(df, target, alpha):
             pass_cols.append([column, chi[1]])
     return failed_cols, pass_cols
 
+def correlated_columns_by_threshold(df, columns, threshhold):
+    corr = df[columns].corr()
+    results = pd.Index([])
+    for column in corr.columns:
+        results = results.union(corr[column][df_test_threshhold(corr, column, threshhold)].index.drop(column))
+    return results
+
+def df_test_threshhold(df,column, threshhold):
+    return (df[column] >= threshhold) & (df[column] >= -threshhold)
+
 def z_test_proportions(df, column, target, target_val, alpha):
     failed_vals, passed_vals = [], []
     table = pd.crosstab(df[column], df[target])
