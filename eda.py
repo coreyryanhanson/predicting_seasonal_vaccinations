@@ -1,11 +1,13 @@
 import re
 import math
 import colorsys
+import matplotlib
 import numpy as np
 import pandas as pd
 import scipy.stats as scs
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.metrics import plot_confusion_matrix
 
 
 def calc_z_from_proportions(v1, v2, n1, n2):
