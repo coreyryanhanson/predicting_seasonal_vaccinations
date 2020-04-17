@@ -132,6 +132,6 @@ def clean_data(df, imputes, impute_dict):
 
     df = impute_vals(df, impute_dict, imputes)
     df = categorical_nans(df, "unknown")
-    # df["age_group"] = df["age_group"].map(rename_ages)
+    df["age_group"] = df["age_group"].map(rename_ages)
     df = redundant_missing(df)
     return df

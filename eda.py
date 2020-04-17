@@ -187,8 +187,66 @@ def hex_to_rgb(hex_color, dec=False):
     else:
         print(f"{hex_color} is not formatted correctly")
 
+
+def confusion_matrix_graph(model, X_test, y_test, font_scale=2, style="darkgrid", palette=None, figsize=(14, 12)):
+    sns.set_style(style)
+    sns.set(font_scale=font_scale)
+    f, ax = plt.subplots(figsize=figsize)
+    converted_pal = matplotlib.colors.ListedColormap(sns.color_palette(palette))
+    plot_confusion_matrix(model, X_test, y_test, cmap=converted_pal, ax=ax)
+    for text in ax.texts:
+        label = text.get_text()
+        label = int(float(label))
+        text.set_text(f"{label}")
+    plt.show()
+
 def independant_palette(color1, color2, sep=10, n_colors=256):
     hsl1, hsl2 = hex_to_hsl(color1), hex_to_hsl(color2)
     pal1 = sns.diverging_palette(hsl1[0], hsl2[0], s=hsl1[1], l=hsl1[2], sep=sep, n=n_colors)
     pal2 = sns.diverging_palette(hsl1[0], hsl2[0], s=hsl2[1], l=hsl2[2], sep=sep, n=n_colors)
     return [*pal1[0:n_colors//2], *pal2[n_colors//2:]]
+
+def show_feature_importances(model, df, figsize=(14, 12), palette=None, font_scale=1, ascending=False, rows=12, style="darkgrid"):
+    sns.set_style(style)
+    f, ax = plt.subplots(figsize=figsize)
+    sns.set(font_scale=font_scale)
+    importance = pd.DataFrame(model.feature_importances_, index=df.columns).reset_index()
+    importance.columns = pd.Index(["Feature", "Importance"])
+    sns.barplot(y="Feature", x="Importance", data=importance.sort_values("Importance",ascending=ascending).iloc[0:rows],
+                palette=palette, ax=ax)
+
+
+def imbal_graph(df, target, title):
+    print('Target Variable: ' + target)
+    print('\n')
+    summary = df.groupby([target])[target].count()
+    print(summary)
+    print('\n')
+    print('Percentages')
+    print(summary/summary.sum())
+    pal = sns.color_palette(("#102ca8", "#ee823e"))
+    plt.figure(figsize = (10,5))
+    sns.countplot(df[target], palette=pal)
+    plt.title(target + ":  " + title)
+    plt.ylabel('Count')
+    plt.show()
+    plt.savefig(f'graphs/{target}_imbalance_check_barchart.png')
+
+
+def stacked(df, columns, target, target_lab):
+    for column in columns:
+        title = column + " " + target + " summary"
+        summary = df.groupby([column,target])[column].count().unstack()
+        print(title)
+        print('\n')
+        print(summary)
+        print(summary/summary.sum(axis=0))
+        print(summary.divide(summary.sum(axis=1),axis=0))
+        pal = sns.color_palette(("#102ca8", "#ee823e"))
+        sns.set_palette(pal)
+        p = summary.plot(kind = 'bar', stacked = True, title = title,)
+        p.set_xlabel(column)
+        p.set_ylabel('Count')
+        p.legend(target_lab)
+        plt.show()
+        plt.savefig(f'graphs/{target}_{column}_barchart.png')
