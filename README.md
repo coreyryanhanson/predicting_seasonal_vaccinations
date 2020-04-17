@@ -30,13 +30,13 @@ There are several features with a strong correlation with the target variable, i
   * Opinion seasonal vaccine effectiveness
   * Opinion seasonal flu risk
   
-![](img/h1n1_feature importance.png)
+![](img/h1n1_feature_importance.png)
   
 ## Predictive Modeling
 
 Based on Accuracy and Area Under the Curve (AUC), our best model appears to be Logistic Regression with an accuracy of .796, a harmonic F1-Score of .781 and an Area Under the Curve of .601.
 
-![](img/logreg_confusion_matrix.png)
+![](img/)
 
 ![](img/logreg_roc.png)
 
