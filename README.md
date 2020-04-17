@@ -32,11 +32,11 @@ There are several features with a strong correlation with the target variable, i
   
 ![](img/h1n1_feature_importance.png)
   
-## Predictive Modeling
+## Predictive Modeling H1N1
 
 Based on Accuracy and Area Under the Curve (AUC), our best model appears to be Logistic Regression with an accuracy of .796, a harmonic F1-Score of .781 and an Area Under the Curve of .601.
 
-![](img/)
+![](img/logreg_confusion_matrix.png)
 
 ![](img/logreg_roc.png)
 
@@ -50,9 +50,26 @@ The Logistic model may not be the best depending on the organizations goals.  Fo
 
 If this is the case, then the Support Vector Machine actully achieved a higher accuracy even though it performed the worst on the AUC metric.  Compared to the Logisitic Regression model, SVM only allowed 15 false positives but with a greater tadeoff of false negatives for a total of 1,063 on the test set.  The low C value of 0.01 means the SVM model is less tolerant of the violation, which in turn gives us a more complex model with a higher variance and a lower bias.
 
+![](img/svm_confusion_matrix.png)
+
 ![](img/svm_roc.png)
 
 On the other hand, if the organizations goals is to minimize resource allocation for a direct mail marketing campaign designed to increase awareness for vaccinations, then the organization may prefer to use the Logisitic Regression model which won't predict everyone who did not vaccinate, but at least the campaign would reach the people who matter most, like the elderly.
 
 We will leave it up to the organization to determine which trade-off they want to make based on their goals.
+
+## Predictive Modeling Seasonal Flu Vaccine
+
+Based on Accuracy and Area Under the Curve (AUC), our best model appears to be Logistic Regression again with an accuracy of .786, a harmonic F1-Score of .786 and an Area Under the Curve of .770.
+
+![](img/confusion_seasonal.png)
+
+![](img/roc_seasonal.png)
+
+## Next Steps & Recommendations
+
+Since we used a broad approach for predictive modeling where we tested many different models without a lot of optimization, we would continue our work by choosing the best models and optimizing them with parameter tuning.
+
+We recommend that the organization clarify it's goals for moving forward so we can optimize the model to meet their goals.
+
 
